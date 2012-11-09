@@ -91,8 +91,13 @@ class actualizaciones():
 				self.btn_aceptar.set_sensitive(False)
 		elif entry == "aumento":
 			texto = self.entry_aumento.get_text()
-			if es_int(texto) or texto == "":
+			if es_int(texto):
 				self.entry_aumento.set_icon_from_stock(1,gtk.STOCK_APPLY)
+				self.entry_aumento.set_property("secondary-icon-tooltip-text",None)
+				self.pagina2[0] = True
+				if not False in self.pagina2:
+					self.btn_aceptar.set_sensitive(True)
+			elif texto == "":
 				self.entry_aumento.set_property("secondary-icon-tooltip-text",None)
 				self.pagina2[0] = True
 				if not False in self.pagina2:
@@ -245,15 +250,15 @@ class actualizaciones():
 			bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
 			cursor=bbdd.cursor()
 			cursor.execute("SELECT costo,codigo FROM "+rubro[0]+" WHERE marca = ?",(self.values[2],))
-			if rubro[0] == "libreria":
+			costo = tupla[0]*(1+float(self.values[0])/100)
+			precio = costo*(1+ganancia[0]/100)
+			if precio <= 20:
 				for tupla in cursor.fetchall():
-					costo = round(tupla[0]*(1+float(self.values[0])/100),1)
-					precio = round(costo*(1+ganancia[0]/100),1)
+					precio = round(precio,1)
 					cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =?",(costo,precio,tupla[1]))
 			else:
 				for tupla in cursor.fetchall():
-					costo = round(tupla[0]*(1+float(self.values[0])/100))
-					precio = round(costo*(1+ganancia[0]/100))
+					precio = round(precio)
 					cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =?",(costo,precio,tupla[1]))
 			bbdd.commit()
 			self.recargar_listas(self_padre,rubro[0],cursor)
@@ -267,15 +272,15 @@ class actualizaciones():
 			bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
 			cursor=bbdd.cursor()
 			cursor.execute("SELECT costo,codigo FROM "+rubro[0]+" WHERE marca = ?",[self.values[2]])
-			if rubro[0] == "libreria":
+			costo = tupla[0]*(1+float(self.values[0])/100)
+			precio = costo*(1+float(self.values[1])/100)
+			if precio <= 20:
 				for tupla in cursor.fetchall():
-					costo = round(tupla[0]*(1+float(self.values[0])/100),1)
-					precio = round(costo*(1+float(self.values[1])/100),1)
+					precio = round(precio,1)
 					cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =?",(costo,precio,tupla[1]))
 			else:
 				for tupla in cursor.fetchall():
-					costo = round(tupla[0]*(1+float(self.values[0])/100))
-					precio = round(costo*(1+float(self.values[1])/100))
+					precio = round(precio)
 					cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =?",(costo,precio,tupla[1]))
 			bbdd.commit()
 			self.recargar_listas(self_padre,rubro[0],cursor)
@@ -304,12 +309,12 @@ class actualizaciones():
 			bbdd.close()
 			bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
 			cursor=bbdd.cursor()
-			if rubro == "libreria":
-				costo = round(self.tupla[5]*(1+float(aumento)/100),1)
-				precio = round(costo*(1+ganancia[0]/100),1)
+			costo = self.tupla[5]*(1+float(aumento)/100)
+			precio = costo*(1+ganancia[0]/100)
+			if precio <= 20:
+				precio = round(precio,1)
 			else:
-				costo = round(self.tupla[5]*(1+float(aumento)/100))
-				precio = round(costo*(1+ganancia[0]/100))
+				precio = round(precio)
 			cursor.execute("UPDATE "+rubro+" SET costo =? , precio =?, sw =? WHERE "+filtro+" =? and marca =?",(costo,precio,reponer,codigo,marca))
 			bbdd.commit()
 			cursor.close()
@@ -344,15 +349,20 @@ class actualizaciones():
 			self.cambios_marca(self_padre)
 			self_padre.window.set_sensitive(True)
 			self.window.destroy()
+			self_padre.btn_modificar.set_sensitive(True)
+			self_padre.btn_eliminar.set_sensitive(True)
 		else:
 			self.cambios_productos(self_padre)
 			self.entry_codigo.set_property("secondary-icon-stock",None)
 			self.entry_aumento.set_property("secondary-icon-stock",None)
+			
 				
 			
 		
-	def cancelar(self,widget,window):
-		window.set_sensitive(True)
+	def cancelar(self,widget,self_padre):
+		self_padre.window.set_sensitive(True)
+		self_padre.btn_modificar.set_sensitive(False)
+		self_padre.btn_eliminar.set_sensitive(False)
 		self.window.destroy()
 		
 	def delete_event(self,widget,event,window):
@@ -422,7 +432,7 @@ class actualizaciones():
 		self.btn_pag_marca.connect("clicked",self.cambiar_pagina,"marca")
 		self.btn_aceptar.connect("clicked",self.aceptar,self_padre)
 		self.checkbutton_reponer.connect("clicked",self.desbloquear_botones)
-		self.btn_cancelar.connect("clicked",self.cancelar,self_padre.window)
+		self.btn_cancelar.connect("clicked",self.cancelar,self_padre)
 		self.window.connect("delete-event",self.delete_event,self_padre.window)
 		self.label.set_sensitive(True)
 		self.notebook.set_sensitive(False)
