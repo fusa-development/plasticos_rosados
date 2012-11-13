@@ -33,7 +33,6 @@ class principal() :
 		cursor.execute("SELECT * FROM bazar")
 		self.liststore_bazar.clear()
 		for tupla in cursor.fetchall():
-			print tupla
 			if tupla[10]:
 				self.liststore_bazar.append([int(tupla[1]),tupla[2],tupla[3],tupla[4],tupla[5],tupla[6],tupla[7],tupla[8],tupla[9]])
 			else:

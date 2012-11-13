@@ -7,12 +7,19 @@ class bajas():
 
 	def press_btn_ok(self,widget,self_padre):
 		ruta = os.getcwd()
-		valor = [str(self_padre.datos_seleccionados[0])]
+		print self_padre.datos_seleccionados
+		valor = str(self_padre.datos_seleccionados[0])
+		print valor
+		if valor == '0':
+			valor = str(self_padre.datos_seleccionados[1])
+			filtro = "nro_art"
+		else:
+			filtro = "codigo"
 		tipo = str(self_padre.datos_seleccionados[8])
 		bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
 		cursor=bbdd.cursor()
 		bbdd.commit()
-		cursor.execute("DELETE FROM "+tipo+" WHERE codigo = ?",valor)
+		cursor.execute("DELETE FROM "+tipo+" WHERE "+filtro+" = ?",(valor,))
 		bbdd.commit()
 		cursor.close()
 		bbdd.close()

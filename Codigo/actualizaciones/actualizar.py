@@ -210,7 +210,7 @@ class actualizaciones():
 	def cambios_marca(self,self_padre):
 		ruta = os.getcwd()
 		self.values = []
-		rubro = [self.combobox.get_active_text().lower()]
+		rubro = self.combobox.get_active_text().lower()
 		self.values.append(self.entry_aumento_marca.get_text())
 		self.values.append(self.entry_ganancia.get_text())
 		self.values.append(self.entry_marcas.get_text())
@@ -221,24 +221,19 @@ class actualizaciones():
 			bbdd.commit()
 			bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
 			cursor=bbdd.cursor()
-			cursor.execute("SELECT costo,codigo,nro_art FROM "+rubro[0]+" WHERE marca = ?",[self.values[2]])
+			cursor.execute("SELECT costo,codigo,nro_art FROM "+rubro+" WHERE marca = ?",[self.values[2]])
 			for tupla in cursor.fetchall():
-				print tupla
 				precio = tupla[0]*(1+float(self.values[1])/100)
 				if precio <= 20:
 					precio = round(precio,1)
-					if tupla[1] == "0":
-						cursor.execute("UPDATE "+rubro[0]+" SET precio =? WHERE nro_art =?",(precio,tupla[2]))
-					else:
-						cursor.execute("UPDATE "+rubro[0]+" SET precio =? WHERE codigo =?",(precio,tupla[1]))
 				else:
 					precio = round(precio)
-					if tupla[1] == "0":
-						cursor.execute("UPDATE "+rubro[0]+" SET precio =? WHERE nro_art =?",(precio,tupla[2]))
-					else:
-						cursor.execute("UPDATE "+rubro[0]+" SET precio =? WHERE codigo =?",(precio,tupla[1]))
+				if tupla[1] == "0":
+					cursor.execute("UPDATE "+rubro+" SET precio =? WHERE nro_art =? AND marca =?",(precio,tupla[2],self.values[2]))
+				else:
+					cursor.execute("UPDATE "+rubro+" SET precio =? WHERE codigo =? AND marca =?",(precio,tupla[1],self.values[2]))
 			bbdd.commit()
-			self.recargar_listas(self_padre,rubro[0],cursor)
+			self.recargar_listas(self_padre,rubro,cursor)
 		elif self.values[0] != "" and self.values[1] == "" :
 			ruta = os.getcwd()
 			bbdd=bdapi.connect(ruta+'/Base_Datos/marcas_rosarinas.db')
@@ -249,19 +244,20 @@ class actualizaciones():
 			bbdd.close()
 			bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
 			cursor=bbdd.cursor()
-			cursor.execute("SELECT costo,codigo FROM "+rubro[0]+" WHERE marca = ?",(self.values[2],))
-			costo = tupla[0]*(1+float(self.values[0])/100)
-			precio = costo*(1+ganancia[0]/100)
-			if precio <= 20:
-				for tupla in cursor.fetchall():
-					precio = round(precio,1)
-					cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =?",(costo,precio,tupla[1]))
-			else:
-				for tupla in cursor.fetchall():
-					precio = round(precio)
-					cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =?",(costo,precio,tupla[1]))
+			cursor.execute("SELECT costo,codigo,nro_art FROM "+rubro+" WHERE marca = ?",(self.values[2],))
+			for tupla in cursor.fetchall():
+					costo = tupla[0]*(1+float(self.values[0])/100)
+					precio = costo*(1+ganancia[0]/100)
+					if precio <= 20:
+						precio = round(precio,1)
+					else:
+						precio = round(precio,1)
+					if tupla[1] == "0":
+						cursor.execute("UPDATE "+rubro+" SET costo =?, precio =? WHERE nro_art =? AND marca =?",(costo,precio,tupla[2],self.values[2]))
+					else:
+						cursor.execute("UPDATE "+rubro+" SET costo =?, precio =? WHERE codigo =? AND marca =?",(costo,precio,tupla[1],self.values[2]))
 			bbdd.commit()
-			self.recargar_listas(self_padre,rubro[0],cursor)
+			self.recargar_listas(self_padre,rubro,cursor)
 		else:
 			bbdd=bdapi.connect(ruta+'/Base_Datos/marcas_rosarinas.db')
 			cursor=bbdd.cursor()
@@ -271,19 +267,20 @@ class actualizaciones():
 			bbdd.close()
 			bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
 			cursor=bbdd.cursor()
-			cursor.execute("SELECT costo,codigo FROM "+rubro[0]+" WHERE marca = ?",[self.values[2]])
-			costo = tupla[0]*(1+float(self.values[0])/100)
-			precio = costo*(1+float(self.values[1])/100)
-			if precio <= 20:
-				for tupla in cursor.fetchall():
+			cursor.execute("SELECT costo,codigo,nro_art FROM "+rubro+" WHERE marca = ?",[self.values[2]])
+			for tupla in cursor.fetchall():
+				costo = tupla[0]*(1+float(self.values[0])/100)
+				precio = costo*(1+float(self.values[1])/100)
+				if precio <= 20:
 					precio = round(precio,1)
-					cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =?",(costo,precio,tupla[1]))
-			else:
-				for tupla in cursor.fetchall():
+				else:
 					precio = round(precio)
-					cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =?",(costo,precio,tupla[1]))
+				if tupla[1] == "0":
+						cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE nro_art =? AND marca =?",(costo,precio,tupla[2],self.values[2]))
+				else:
+						cursor.execute("UPDATE "+rubro[0]+" SET costo =?, precio =? WHERE codigo =? AND marca =?",(costo,precio,tupla[1],self.values[2]))
 			bbdd.commit()
-			self.recargar_listas(self_padre,rubro[0],cursor)
+			self.recargar_listas(self_padre,rubro,cursor)
 		cursor.close()
 		bbdd.close()
 		

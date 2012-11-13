@@ -46,22 +46,27 @@ class control():
 
 	def restar_cantidad(self,widget):
 		cantidad = self.entry_cantidad.get_text()
-		if cantidad != "":
-			ruta = os.getcwd()
-			self.tupla[6]= self.tupla[6]-int(cantidad)
-			if self.tupla[7] >= self.tupla[6]:
-				self.tupla [9] = True
-			bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
-			cursor=bbdd.cursor()
-			cursor.execute("UPDATE "+self.tupla[8]+" SET stk_disp = ?, aviso = ? WHERE codigo = ?",(self.tupla[6],self.tupla[9],self.tupla[0]))
-			self.tupla = []
-			bbdd.commit()
-			cursor.close()
-			bbdd.close()
-			self.liststore.clear()
-			self.entry_filtro.set_text("")
-			self.entry_descripcion.set_text("")
-			self.entry_filtro.set_text("")
+		if cantidad == "":
+			cantidad = 1
+		else:
+			cantidad = int(cantidad)
+		ruta = os.getcwd()
+		self.tupla[6]= self.tupla[6]-cantidad
+		if self.tupla[7] >= self.tupla[6]:
+			self.tupla [9] = True
+		bbdd=bdapi.connect(ruta+'/Base_Datos/stock_rosarino.db')
+		cursor=bbdd.cursor()
+		cursor.execute("UPDATE "+self.tupla[8]+" SET stk_disp = ?, aviso = ? WHERE codigo = ?",(self.tupla[6],self.tupla[9],self.tupla[0]))
+		self.tupla = []
+		bbdd.commit()
+		cursor.close()
+		bbdd.close()
+		self.liststore.clear()
+		self.entry_descripcion.set_text("")
+		self.entry_filtro.set_text("")
+		self.entry_cantidad.set_text("")
+		self.entry_filtro.set_property("is-focus",1)
+		
 
 	def delete_event(self,widget,event,self_padre):
 		self_padre.window.set_sensitive(True)
