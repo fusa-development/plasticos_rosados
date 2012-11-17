@@ -7,9 +7,7 @@ class bajas():
 
 	def press_btn_ok(self,widget,self_padre):
 		ruta = os.getcwd()
-		print self_padre.datos_seleccionados
 		valor = str(self_padre.datos_seleccionados[0])
-		print valor
 		if valor == '0':
 			valor = str(self_padre.datos_seleccionados[1])
 			filtro = "nro_art"

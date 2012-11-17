@@ -538,7 +538,7 @@ Calle 12 N° 1018 -Tel. 02324-424151
                             <property name="width_request">1260</property>
                             <property name="height_request">450</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
+                            <property name="can_focus">False</property>
                             <property name="scrollable">True</property>
                             <property name="tab_border">8</property>
                             <property name="tab_hborder">29</property>
